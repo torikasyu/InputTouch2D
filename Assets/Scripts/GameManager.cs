@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
 	public GameObject prefab;
-	public Camera camera;
+	public Camera myCamera;
 
 	// Use this for initialization
 	void Start () {
@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour {
 		{
 			// タッチ開始
 			//Vector3 tPos = AppUtil.GetTouchPosition();
-			Vector3 tPos = AppUtil.GetTouchWorldPosition(camera);
+			Vector3 tPos = AppUtil.GetTouchWorldPosition(myCamera);
 
 			Instantiate(prefab, new Vector3(tPos.x,tPos.y,0), Quaternion.identity);
 		}
