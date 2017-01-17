@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 	
 		this.textLife.text = Life.ToString ();
+
 	}
 
 	
@@ -43,7 +44,7 @@ public class GameManager : MonoBehaviour {
 				if (tPos.y > 4) {
 					Instantiate (prefab, new Vector3 (tPos.x, tPos.y, 0), Quaternion.identity);
 
-					Life--;
+					//Life--;
 					this.textLife.text = this.Life.ToString ();
 				}
 			}
