@@ -5,7 +5,7 @@ using UnityEngine;
 public class AccelGravity : MonoBehaviour {
 
 	private Rigidbody2D rb;
-	private float force = 100.0f; 
+	private float force = 200.0f; 
 
 	// Use this for initialization
 	void Start () {
