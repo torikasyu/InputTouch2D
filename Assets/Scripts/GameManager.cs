@@ -12,11 +12,12 @@ public class GameManager : MonoBehaviour {
 
 	// Public Properties
 	public int Life = 10;
+	public int Score = 0;
 
 	// Use this for initialization
 	void Start () {
 	
-		this.textLife.text = Life.ToString ();
+		//this.textLife.text = Life.ToString ();
 
 	}
 
@@ -41,13 +42,22 @@ public class GameManager : MonoBehaviour {
 				// タッチ開始
 				Vector3 tPos = AppUtil.GetTouchWorldPosition (myCamera);
 
+				Instantiate (prefab, new Vector3 (tPos.x, tPos.y, 0), Quaternion.identity);
+
 				if (tPos.y > 4) {
-					Instantiate (prefab, new Vector3 (tPos.x, tPos.y, 0), Quaternion.identity);
+					//Instantiate (prefab, new Vector3 (tPos.x, tPos.y, 0), Quaternion.identity);
 
 					//Life--;
-					this.textLife.text = this.Life.ToString ();
+					//this.textLife.text = this.Life.ToString ();
 				}
 			}
 		}
 	}
+
+	public void AddScore()
+	{
+		Score++;
+		this.textLife.text = Score.ToString();
+	}
+		
 }
