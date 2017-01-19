@@ -18,8 +18,14 @@ public class CatchBusket : MonoBehaviour {
 	{
 		Destroy(coll.gameObject);
 
-		GameObject go = GameObject.Find ("GameManager");
-		GameManager gm = (GameManager)go.GetComponent<GameManager> ();
+		GameObject gmObj = GameObject.Find ("GameManager");
+		GameManager gm = (GameManager)gmObj.GetComponent<GameManager> ();
 		gm.AddScore ();
+
+		// Tween
+		GameObject mouseObj = GameObject.Find ("pMouse");
+		Mouse mouse = mouseObj.GetComponent<Mouse>();
+		mouse.Shake ();
+
 	}
 }
