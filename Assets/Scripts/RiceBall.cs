@@ -12,7 +12,7 @@ public class RiceBall : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if (this.gameObject.transform.position.y < -10) {
+		if (this.gameObject.transform.position.y < -21) {
 			Destroy (this.gameObject);
 		}
 		
