@@ -9,14 +9,26 @@ public class GameManager : MonoBehaviour {
 	public GameObject riceBallPrefab;
 	public GameObject mousePrefab;
 	public Camera myCamera;
+	public GameObject Tile;
+
+	// Outlets for UI
 	public Text textLife;
+	public Text textTime;
+	public Text textMessage;
+	public Text labelGameOver;
+	public Button buttonRestart;
 
 	// Public Properties
-	public int Life = 10;
-	public int Score = 0;
-	//private int fireForce = 0;
+	public int initialLife = 3;
 
+	//private int fireForce = 0;
+	private int Life;
+	private int Score;
+	private float ErapsedTime;
+
+	private GameObject riceBallInstance;
 	private GameState gameState;
+	private AudioSource mainBGM;
 
 	public enum GameState
 	{
@@ -31,6 +43,11 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		gameState = GameState.GameInit;
+		mainBGM = GetComponent<AudioSource> ();
+
+		this.labelGameOver.enabled = false;
+		this.textMessage.enabled = false;
+		this.buttonRestart.gameObject.SetActive(false);
 	}
 
 
@@ -39,6 +56,7 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		//print (gameState);
 
 		switch (gameState) {
 
@@ -53,15 +71,15 @@ public class GameManager : MonoBehaviour {
 		case GameState.Demo:
 
 			if (isDemoCameraDown) {
-				myCamera.transform.position += new Vector3(0f, -2f*Time.deltaTime, 0f);
-					if(myCamera.transform.position.y < -10)
+				myCamera.transform.position += new Vector3(0f, -4f * Time.deltaTime, 0f);
+					if(myCamera.transform.position.y < -10.5)
 					{
 						isDemoCameraDown = false;
 					}
 				}
 			else
 			{
-				myCamera.transform.position += new Vector3(0f, 2f*Time.deltaTime, 0f);
+				myCamera.transform.position += new Vector3(0f, 4f * Time.deltaTime, 0f);
 				if(myCamera.transform.position.y > 0)
 				{
 					gameState = GameState.Start;
@@ -71,46 +89,55 @@ public class GameManager : MonoBehaviour {
 
 		case GameState.Start:
 
-			GameObject firstGo = Instantiate (riceBallPrefab, new Vector3 (-1.8f, 4.2f, 0), Quaternion.identity);
+			if (this.Life > 0) {
+				this.Life--;
+				this.textLife.text = this.Life.ToString ();
 
-			this.riceBallPrefab = firstGo;
-			offset = myCamera.transform.position - this.riceBallPrefab.transform.position;
+				GameObject riceBall = Instantiate (riceBallPrefab, new Vector3 (-1.8f, 4.2f, 0), Quaternion.identity);
 
-			Rigidbody2D rb = firstGo.GetComponent<Rigidbody2D> ();
-			rb.AddForce (new Vector2 (30, 25));
+				this.riceBallInstance = riceBall;	//カメラ追跡用
 
-			this.gameState = GameState.Playing;
+				offset = myCamera.transform.position - riceBall.transform.position;
+
+				//Rigidbody2D rb = riceBall.GetComponent<Rigidbody2D> ();
+				//rb.AddForce (new Vector2 (30, 25));
+
+				this.gameState = GameState.Playing;
+			}
+			else
+			{
+				this.gameState = GameState.Over;
+			}
 
 			break;
 
 		case GameState.Playing:
 
-			/*
+			ErapsedTime += Time.deltaTime;
+			this.textTime.text = ErapsedTime.ToString ("F0");
+
+
 			TouchInfo info = AppUtil.GetTouch ();
-
 			if (info == TouchInfo.Began) {
-				fireForce = 0;
-			} else if (info == TouchInfo.Moved || info == TouchInfo.Stationary) {
-				fireForce++;
-			} else if (info == TouchInfo.Ended) {
 				Vector3 tPos = AppUtil.GetTouchWorldPosition (myCamera);
-
-				if (tPos.y > 4 && tPos.x < -2) {
-					GameObject go = Instantiate (prefab, new Vector3 (tPos.x, tPos.y, 0), Quaternion.identity);
-					Rigidbody2D rb = go.GetComponent<Rigidbody2D> ();
-					rb.AddForce (new Vector2 ((25 + fireForce) * 3, (25 + fireForce) / 2 * 2));
-
-					fireForce = 0;
-
-					//Life--;
-					//this.textLife.text = this.Life.ToString ();
+				Collider2D col = Physics2D.OverlapPoint (new Vector2 (tPos.x, tPos.y));
+				if (col) {
+					if (col.gameObject.tag == "RiceBall") {
+						Rigidbody2D rb = col.GetComponent<Rigidbody2D> ();
+						rb.AddForce (new Vector2 (0, 100));
+					}
 				}
 			}
-			*/
-
 			break;
 
 		case GameState.Over:
+			this.labelGameOver.enabled = true;
+			this.textMessage.enabled = true;
+			this.textMessage.text = string.Format ("{0:d}かいせいこう\nかかったじかん{1:f0}びょう", Score, ErapsedTime);
+			this.buttonRestart.gameObject.SetActive (true);
+
+			this.mainBGM.Stop ();
+
 			break;
 
 		default:
@@ -123,40 +150,85 @@ public class GameManager : MonoBehaviour {
 
 	void LateUpdate () {
 
-		// Camera Chase to RiceBall
-		if (this.gameState == GameState.Playing && myCamera.transform.position.y > -10) {
+		// カメラ追跡処理
+		if (this.gameState == GameState.Playing && myCamera.transform.position.y > -10.5) {
 			Vector3 newPosition = myCamera.transform.position;
-			newPosition.y = this.riceBallPrefab.transform.position.y + offset.y;
+			newPosition.y = this.riceBallInstance.transform.position.y + offset.y;
+
+			if (newPosition.y > 0) {
+				newPosition.y = 0;
+			}
+
 			//myCamera.transform.position = newPosition;
 			myCamera.transform.position = Vector3.Lerp (myCamera.transform.position, newPosition, 5.0f * Time.deltaTime);
 		}
 	
 	}
 
+	// ゲーム全体の開始の処理
 	private void GameInit()
 	{
+		this.Life = this.initialLife;
+		this.Score = 0;
+		this.ErapsedTime = 0;
+
+		this.textLife.text = Life.ToString ();
+		this.textTime.text = ErapsedTime.ToString ("f0");
+
+		this.labelGameOver.enabled = false;
+		this.textMessage.enabled = false;
+		this.buttonRestart.gameObject.SetActive(false);
+
+		// おにぎりが存在したら削除
 		GameObject[] gos = GameObject.FindGameObjectsWithTag ("RiceBall");
 		foreach (GameObject go in gos) {
 			Destroy (go);
 		}
 
-		Score = 0;
+
 		this.gameState = GameState.StageInit;
+
+		for (int i = -3; i < 4; i++) {
+			for (int j = 6; j > -30; j--) {
+				Instantiate (Tile, new Vector3 (i, j, 0), Quaternion.identity);
+			}
+		}
+
+		this.mainBGM.Play ();
 	}
 
+	// ステージ（ねずみ・障害物）生成時の処理
 	private void StageInit()
 	{
-		// mouse init
+		if (this.Life <= 0) {
+			this.gameState = GameState.Over;
+			return;
+		}
 
-		GameObject mouse = Instantiate(mousePrefab,new Vector3 (Random.Range(-2.8f,2.8f),-14, 0), Quaternion.identity);
+		//カメラリセット
+		this.myCamera.transform.position = new Vector3(0,0,-10);
 
+		// ねずみ削除・作成
+		GameObject[] gos = GameObject.FindGameObjectsWithTag ("Mouse");
+		foreach (GameObject go in gos) {
+			Destroy (go);
+		}
+
+		Instantiate(mousePrefab,new Vector3 (Random.Range(-2.6f,2.6f),-14, 0), Quaternion.identity);
+	
+		// ステージデモに遷移
+		this.isDemoCameraDown = true;
 		this.gameState = GameState.Demo;
 	}
 		
 	public void AddScore()
 	{
 		Score++;
-		this.textLife.text = Score.ToString();
+	}
+
+	public void ChangeGameState(GameState state)
+	{
+		this.gameState = state;		
 	}
 		
 }

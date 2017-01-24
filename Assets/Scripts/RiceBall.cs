@@ -5,16 +5,31 @@ using UnityEngine;
 public class RiceBall : MonoBehaviour {
 
 
+	private AudioSource pongSound;
+
 	// Use this for initialization
 	void Start () {
+		pongSound = GetComponent<AudioSource>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		if (this.gameObject.transform.position.y < -21) {
+		if (this.gameObject.transform.position.y < -20) {
+			
+			GameObject gmObj = GameObject.Find ("GameManager");
+			GameManager gm = (GameManager)gmObj.GetComponent<GameManager> ();
+
+			gm.ChangeGameState (GameManager.GameState.StageInit);
+
 			Destroy (this.gameObject);
+
 		}
-		
 	}
+
+	void OnCollisionEnter2D(Collision2D coll)
+	{
+		pongSound.Play ();
+	}
+
 }
