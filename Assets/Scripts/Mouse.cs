@@ -18,27 +18,10 @@ public class Mouse : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-		/*
-		if( yPlus ) {
-			transform.position += new Vector3(2f*Time.deltaTime, 0f, 0f);
-			if( transform.position.x >= 3 )
-				yPlus = false;
-		} else {
-			transform.position -= new Vector3(2f*Time.deltaTime, 0f, 0f);
-			if( transform.position.x <= -3 )
-				yPlus = true;
-		}
-		*/
-
 	}
 
 	public void Shake()
 	{
-		//transform.DOShakePosition (2f);
-		//transform.DOJump (new Vector3 (-3f, 0, 0), 3, 3, 3f).SetEase (Ease.Linear);
-		//transform.DOJump (new Vector3 (0, -1f, 0), 2, 1, 1f, false);
-
 		if (isMoving == false) {
 			isMoving = true;
 
@@ -49,8 +32,6 @@ public class Mouse : MonoBehaviour {
 				1.5f                      // アニメーション時間
 			).SetRelative ().SetEase (Ease.Linear).OnComplete (callback);
 		}
-		//RectTransform rt = this.gameObject.GetComponent<RectTransform> ();
-		//rt.DOJump (new Vector3 (-3f, 0, 0), 3, 3, 3f).SetEase (Ease.Linear);
 	}
 
 	private void callback()
@@ -70,10 +51,7 @@ public class Mouse : MonoBehaviour {
 			// Tween
 			this.Shake ();
 			StartCoroutine (JumpSoundPlay());
-			StartCoroutine ("wait", gm);
-			
-			// Next RiceBall
-			//gm.ChangeGameState(GameManager.GameState.StageInit);
+			StartCoroutine ("wait", gm);			
 		}
 	}
 
@@ -90,6 +68,4 @@ public class Mouse : MonoBehaviour {
 		yield return new WaitForSeconds(2);
 		gm.ChangeGameState(GameManager.GameState.StageInit);
 	}
-
-
 }

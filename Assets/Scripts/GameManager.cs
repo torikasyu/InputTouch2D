@@ -5,28 +5,37 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
-	// Outlets
+	// Outlets for Game
 	public GameObject riceBallPrefab;
 	public GameObject mousePrefab;
 	public Camera myCamera;
 	public GameObject Tile;
+	public GameObject[] SeeSaw;
+	public GameObject SeeSawNormal;
+	public GameObject SeeSawAlt;
 
 	// Outlets for UI
 	public Text textLife;
 	public Text textTime;
 	public Text textMessage;
+	public Text textHiScore;
 	public Text labelGameOver;
 	public Button buttonRestart;
 
 	// Public Properties
 	public int initialLife = 3;
+	public int initialTime = 90;
 
 	//private int fireForce = 0;
 	private int Life;
 	private int Score;
-	private float ErapsedTime;
+	private float RemainTime;
+
+	private int HiScore;
+	private int BestTime;
 
 	private GameObject riceBallInstance;
+	private GameObject mouseInstance;
 	private GameState gameState;
 	private AudioSource mainBGM;
 
@@ -49,9 +58,23 @@ public class GameManager : MonoBehaviour {
 		this.textMessage.enabled = false;
 		this.buttonRestart.gameObject.SetActive(false);
 	}
+		
+	private enum DemoCameraState
+	{
+		Down,
+		MouseJumpStart,
+		Stop,
+		Up
+	}
+
+	private DemoCameraState demoCameraState = DemoCameraState.Down;
 
 
-	private bool isDemoCameraDown = true;
+	IEnumerator waitForDemoMouse()
+	{
+		yield return new WaitForSeconds (1.5f);
+		demoCameraState = DemoCameraState.Up;
+	}
 
 	// Update is called once per frame
 	void Update () {
@@ -70,19 +93,27 @@ public class GameManager : MonoBehaviour {
 
 		case GameState.Demo:
 
-			if (isDemoCameraDown) {
-				myCamera.transform.position += new Vector3(0f, -4f * Time.deltaTime, 0f);
-					if(myCamera.transform.position.y < -10.5)
-					{
-						isDemoCameraDown = false;
-					}
+			if (demoCameraState == DemoCameraState.Down) {
+				myCamera.transform.position += new Vector3 (0f, -2.5f * Time.deltaTime, 0f);
+				if (myCamera.transform.position.y < -10.5) {
+					demoCameraState = DemoCameraState.MouseJumpStart;
 				}
+			} else if (demoCameraState == DemoCameraState.MouseJumpStart) {
+
+				this.mouseInstance.GetComponent<Mouse> ().Shake ();
+				demoCameraState = DemoCameraState.Stop;
+			
+			} else if (demoCameraState == DemoCameraState.Stop) {
+				StartCoroutine(waitForDemoMouse());
+			}
 			else
 			{
 				myCamera.transform.position += new Vector3(0f, 4f * Time.deltaTime, 0f);
 				if(myCamera.transform.position.y > 0)
 				{
 					gameState = GameState.Start;
+					this.textHiScore.enabled = false;
+					this.textMessage.enabled = false;
 				}
 			}
 			break;
@@ -93,14 +124,8 @@ public class GameManager : MonoBehaviour {
 				this.Life--;
 				this.textLife.text = this.Life.ToString ();
 
-				GameObject riceBall = Instantiate (riceBallPrefab, new Vector3 (-1.8f, 4.2f, 0), Quaternion.identity);
-
-				this.riceBallInstance = riceBall;	//カメラ追跡用
-
-				offset = myCamera.transform.position - riceBall.transform.position;
-
-				//Rigidbody2D rb = riceBall.GetComponent<Rigidbody2D> ();
-				//rb.AddForce (new Vector2 (30, 25));
+				//カメラ追跡用
+				this.riceBallInstance = Instantiate (riceBallPrefab, new Vector3 (-1.8f, 4.5f, 0), Quaternion.identity);
 
 				this.gameState = GameState.Playing;
 			}
@@ -113,10 +138,26 @@ public class GameManager : MonoBehaviour {
 
 		case GameState.Playing:
 
-			ErapsedTime += Time.deltaTime;
-			this.textTime.text = ErapsedTime.ToString ("F0");
+			if (this.riceBallInstance != null) {
+				offset = myCamera.transform.position - this.riceBallInstance.transform.position;
+			}
+			//print (this.riceBallInstance.transform.position.y);
 
+			RemainTime -= Time.deltaTime;
+			if (RemainTime < 0) {
+				RemainTime = 0;
+			}
+			this.textTime.text = RemainTime.ToString ("F0");
 
+			// 時間切れ
+			if (RemainTime == 0) {
+				this.gameState = GameState.Over;
+				this.riceBallInstance.gameObject.SetActive (false);
+
+				break;
+			}
+
+			/*
 			TouchInfo info = AppUtil.GetTouch ();
 			if (info == TouchInfo.Began) {
 				Vector3 tPos = AppUtil.GetTouchWorldPosition (myCamera);
@@ -128,13 +169,36 @@ public class GameManager : MonoBehaviour {
 					}
 				}
 			}
+			*/
+
 			break;
 
 		case GameState.Over:
+
+
 			this.labelGameOver.enabled = true;
 			this.textMessage.enabled = true;
-			this.textMessage.text = string.Format ("{0:d}かいせいこう\nかかったじかん{1:f0}びょう", Score, ErapsedTime);
+
+			string message = "{0:d}かいせいこう\nのこり{1:f0}びょう";
+
+			bool isHiScore = true;
+
+			if (this.HiScore < Score) {
+				message += "\nハイスコア！";			
+			} else if (this.HiScore == Score && this.BestTime < RemainTime) {
+				message += "\nベストタイム！";			
+			} else {
+				isHiScore = false;
+			}
+			this.textMessage.text = string.Format (message, Score, RemainTime);
+
+			this.textHiScore.enabled = !isHiScore;
 			this.buttonRestart.gameObject.SetActive (true);
+
+			if (isHiScore) {
+				PlayerPrefs.SetInt ("HiScore", Score);
+				PlayerPrefs.SetInt ("BestTime", (int)RemainTime);
+			}
 
 			this.mainBGM.Stop ();
 
@@ -153,16 +217,15 @@ public class GameManager : MonoBehaviour {
 		// カメラ追跡処理
 		if (this.gameState == GameState.Playing && myCamera.transform.position.y > -10.5) {
 			Vector3 newPosition = myCamera.transform.position;
-			newPosition.y = this.riceBallInstance.transform.position.y + offset.y;
+			//newPosition.y = this.riceBallInstance.transform.position.y + offset.y;
+			newPosition.y = myCamera.transform.position.y - offset.y;
 
 			if (newPosition.y > 0) {
 				newPosition.y = 0;
 			}
 
-			//myCamera.transform.position = newPosition;
 			myCamera.transform.position = Vector3.Lerp (myCamera.transform.position, newPosition, 5.0f * Time.deltaTime);
-		}
-	
+		}	
 	}
 
 	// ゲーム全体の開始の処理
@@ -170,14 +233,23 @@ public class GameManager : MonoBehaviour {
 	{
 		this.Life = this.initialLife;
 		this.Score = 0;
-		this.ErapsedTime = 0;
+		this.RemainTime = this.initialTime;
 
 		this.textLife.text = Life.ToString ();
-		this.textTime.text = ErapsedTime.ToString ("f0");
+		this.textTime.text = RemainTime.ToString ("f0");
 
 		this.labelGameOver.enabled = false;
 		this.textMessage.enabled = false;
 		this.buttonRestart.gameObject.SetActive(false);
+
+		// ハイスコアの取得
+		this.HiScore = PlayerPrefs.GetInt ("HiScore");
+		this.BestTime = PlayerPrefs.GetInt ("BestTime");
+
+		this.textHiScore.enabled = true;
+		this.textHiScore.text = string.Format("さいこうきろく{0:d}こ\nのこり{1:d}びょう",HiScore,BestTime);
+		this.textMessage.enabled = true;
+		this.textMessage.text = "スマホをかたむけて\nおむすびをねずみさんに\nもっていこう";
 
 		// おにぎりが存在したら削除
 		GameObject[] gos = GameObject.FindGameObjectsWithTag ("RiceBall");
@@ -185,12 +257,20 @@ public class GameManager : MonoBehaviour {
 			Destroy (go);
 		}
 
+		// シーソーを全てノーマルに
+		int i = 0;
+		foreach (GameObject tmp in this.SeeSaw) {
+			Vector3 pos = tmp.transform.position;
+			Destroy (tmp);
+			this.SeeSaw[i] = Instantiate (this.SeeSawNormal, pos,Quaternion.identity);
+			i++;
+		}
 
 		this.gameState = GameState.StageInit;
 
-		for (int i = -3; i < 4; i++) {
-			for (int j = 6; j > -30; j--) {
-				Instantiate (Tile, new Vector3 (i, j, 0), Quaternion.identity);
+		for (int xPos = -3; xPos < 4; xPos++) {
+			for (int yPos = 4; yPos > -30; yPos--) {
+				Instantiate (Tile, new Vector3 (xPos, yPos, 0), Quaternion.identity);
 			}
 		}
 
@@ -214,10 +294,24 @@ public class GameManager : MonoBehaviour {
 			Destroy (go);
 		}
 
-		Instantiate(mousePrefab,new Vector3 (Random.Range(-2.6f,2.6f),-14, 0), Quaternion.identity);
+		this.mouseInstance = Instantiate(mousePrefab,new Vector3 (Random.Range(-2.6f,2.6f),-14, 0), Quaternion.identity);
 	
+		// シーソーの置き換え
+		if (this.Score > 0) {
+			int i = 0;
+			foreach (GameObject tmp in this.SeeSaw) {
+				Vector3 pos = tmp.transform.position;
+				int rand = Random.Range (0, 3);
+				if (rand == 0) {
+					Destroy (tmp);
+					this.SeeSaw [i] = Instantiate (this.SeeSawAlt, pos, Quaternion.identity);
+				}
+				i++;
+			}
+		}
+			
 		// ステージデモに遷移
-		this.isDemoCameraDown = true;
+		this.demoCameraState = DemoCameraState.Down;
 		this.gameState = GameState.Demo;
 	}
 		
