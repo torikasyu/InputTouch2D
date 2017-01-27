@@ -20,10 +20,8 @@ public class RiceBall : MonoBehaviour {
 			GameObject gmObj = GameObject.Find ("GameManager");
 			GameManager gm = (GameManager)gmObj.GetComponent<GameManager> ();
 
-			gm.ChangeGameState (GameManager.GameState.StageInit);
-
-			Destroy (this.gameObject);
-
+			gm.setMessageText ("ざんねん");
+			gm.RiceLostAction ();
 		}
 	}
 

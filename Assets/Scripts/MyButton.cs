@@ -16,7 +16,7 @@ public class MyButton : MonoBehaviour {
 
 	/// ボタンをクリックした時の処理
 	public void OnClick() {
-		Debug.Log("Button click!");
+		//Debug.Log("Button click!");
 
 		GameObject gmObj = GameObject.Find ("GameManager");
 		GameManager gm = (GameManager)gmObj.GetComponent<GameManager> ();

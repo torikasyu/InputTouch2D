@@ -6,17 +6,13 @@ using DG.Tweening;
 
 public class Mouse : MonoBehaviour {
 
-	private bool isMoving = false;
-	//private bool yPlus = false; 
-
+	private bool isMoving = false;	// Tweenの二重起動防止用
 	private AudioSource soundJump;
 
-	// Use this for initialization
 	void Start () {
 		soundJump = GetComponent<AudioSource> ();
 	}
 	
-	// Update is called once per frame
 	void Update () {
 	}
 
@@ -42,16 +38,19 @@ public class Mouse : MonoBehaviour {
 	void OnCollisionEnter2D(Collision2D coll)
 	{
 		if (coll.gameObject.tag == "RiceBall") {
-			Destroy (coll.gameObject);
+			//Destroy (coll.gameObject);
 
 			GameObject gmObj = GameObject.Find ("GameManager");
 			GameManager gm = (GameManager)gmObj.GetComponent<GameManager> ();
+
 			gm.AddScore ();
+			gm.setMessageText ("やったね！");
 
 			// Tween
 			this.Shake ();
 			StartCoroutine (JumpSoundPlay());
-			StartCoroutine ("wait", gm);			
+
+			gm.RiceLostAction ();
 		}
 	}
 
@@ -62,10 +61,5 @@ public class Mouse : MonoBehaviour {
 		yield return new WaitForSeconds (0.5f);
 		soundJump.Play ();
 		yield return 0;
-	}
-
-	IEnumerator wait(GameManager gm){
-		yield return new WaitForSeconds(2);
-		gm.ChangeGameState(GameManager.GameState.StageInit);
 	}
 }
