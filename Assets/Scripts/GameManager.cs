@@ -297,7 +297,17 @@ public class GameManager : MonoBehaviour {
 			this.SeeSaw[i] = Instantiate (this.SeeSawNormal, pos,Quaternion.identity);
 			i++;
 		}
-			
+
+		int j = 0;
+		foreach (GameObject tmp in this.SeeSawlarge) {
+			Vector3 pos = tmp.transform.position;
+			Destroy (tmp);
+			this.SeeSawlarge[j] = Instantiate (this.SeeSawNormal, pos,Quaternion.identity);
+			this.SeeSawlarge [j].transform.localScale = new Vector3 (1, 1, 1);
+			j++;
+		}
+
+
 		this.mainBGM.Play ();
 	
 		this.gameState = GameState.StageInit;

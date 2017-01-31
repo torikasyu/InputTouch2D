@@ -1307,7 +1307,12 @@ Prefab:
     - target: {fileID: 114142859117739946, guid: a54f02e6c72ec4560b3d4bed63dfd50f,
         type: 2}
       propertyPath: ios_Banner
-      value: ca-app-pub-0287533856754018/4371423586
+      value: ca-app-pub-0287533856754018/8522421580
+      objectReference: {fileID: 0}
+    - target: {fileID: 82647072634552884, guid: a54f02e6c72ec4560b3d4bed63dfd50f,
+        type: 2}
+      propertyPath: BypassListenerEffects
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a54f02e6c72ec4560b3d4bed63dfd50f, type: 2}

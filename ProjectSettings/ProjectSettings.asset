@@ -7,11 +7,11 @@ PlayerSettings:
   productGUID: 333b59c6f4f8d4944bd197c3f0f5fc39
   AndroidProfiler: 0
   defaultScreenOrientation: 0
-  targetDevice: 2
+  targetDevice: 0
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: torikasyu
-  productName: "\u304A\u3080\u3053\u308D"
+  productName: "\u304A\u3080\u3059\u3073\u30B2\u30FC\u30E0"
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21176471, a: 1}
