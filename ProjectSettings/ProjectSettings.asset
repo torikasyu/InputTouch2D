@@ -7,7 +7,7 @@ PlayerSettings:
   productGUID: 333b59c6f4f8d4944bd197c3f0f5fc39
   AndroidProfiler: 0
   defaultScreenOrientation: 0
-  targetDevice: 0
+  targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: torikasyu
@@ -133,7 +133,7 @@ PlayerSettings:
   stripEngineCode: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 0
-  iPhoneBuildNumber: 0
+  iPhoneBuildNumber: 3
   ForceInternetPermission: 0
   ForceSDCardPermission: 0
   CreateWallpaper: 0
@@ -213,7 +213,10 @@ PlayerSettings:
       m_Width: 128
       m_Height: 128
   m_BuildTargetBatching: []
-  m_BuildTargetGraphicsAPIs: []
+  m_BuildTargetGraphicsAPIs:
+  - m_BuildTarget: iOSSupport
+    m_APIs: 0b0000000800000010000000
+    m_Automatic: 0
   m_BuildTargetVRSettings: []
   openGLRequireES31: 0
   openGLRequireES31AEP: 0

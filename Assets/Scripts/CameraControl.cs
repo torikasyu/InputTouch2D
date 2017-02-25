@@ -5,18 +5,39 @@ using UnityEngine;
 public class CameraControl : MonoBehaviour {
 	 	 
 	void Awake () {
-		Camera cam = gameObject.GetComponent<Camera>();
-		float baseAspect = 1134f/750f;
+		print ("Camera Controll Called");
+
+		float height = 667f;
+		float width = 375f;
+
+		Camera cam = GetComponent<Camera>();
+		float baseAspect = height / width;
 		float nowAspect = (float)Screen.height/(float)Screen.width;
 		float changeAspect;
 
-		if(baseAspect>nowAspect){   
+		//cam.orthographicSize = (width / 2f / 100f);
+		cam.orthographicSize = 5.5f;
+
+		if(baseAspect > nowAspect){   
+
+			//float bgScale = height / Screen.height;
+			//float camWidth = width / (Screen.width * bgScale);
+			//cam.rect = new Rect ((1f - camWidth) / 2f, 0f, camWidth, 1f);
+
 			changeAspect = nowAspect/baseAspect;
-			cam.rect=new Rect((1-changeAspect)*0.5f,0,changeAspect,1);
+			cam.rect=new Rect((1f - changeAspect)*0.5f,0f,changeAspect,1f);
+
 		}else{
+			
+			//float bgScale = width / Screen.width;
+			//float camHeight = height / (Screen.height * bgScale);
+			//cam.rect = new Rect (0f, (1f - camHeight) / 2f, 1f, camHeight);
+
 			changeAspect = baseAspect/nowAspect;
-			cam.rect=new Rect(0,(1-changeAspect)*0.5f,1,changeAspect);
+			cam.rect=new Rect(0,(1f - changeAspect)*0.5f,1f,changeAspect);
 		}
+
+
 		Destroy(this);
 	}
 
