@@ -2,8 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class CameraControl : MonoBehaviour {
-	 	 
+
+	public     float     screenWidth = 375;
+
+	private Camera    camera;
+
+	private float    size;
+	private float    ratio;
+	private float    screenHeight;
+
+	void Awake()
+	{
+		camera = GetComponent<Camera> ();
+		ratio = (float)Screen.height / (float)Screen.width;
+		print (Screen.height.ToString() + "," + Screen.width.ToString ());
+
+		print ("ratio:" + ratio.ToString ());
+		print ("screenwidth:" + screenWidth.ToString ());
+
+		screenHeight =  screenWidth * ratio;
+		print ("screenheight:" + screenHeight.ToString ());
+
+		size = screenHeight / 200;
+		camera.orthographicSize = size;
+	
+		print ("Size:" + size.ToString ());
+	}
+
+	void Update ()
+	{
+		/*
+		camera = GetComponent<Camera> ();
+		ratio = (float)Screen.height / (float)Screen.width;
+		screenHeight =  screenWidth * ratio;
+		size = screenHeight / 200;
+		camera.orthographicSize = size;
+		*/
+	}
+
+	/*
 	void Awake () {
 		print ("Camera Controll Called");
 
@@ -16,7 +55,7 @@ public class CameraControl : MonoBehaviour {
 		float changeAspect;
 
 		//cam.orthographicSize = (width / 2f / 100f);
-		cam.orthographicSize = 5.5f;
+		cam.orthographicSize = Screen.height/2f/height;
 
 		if(baseAspect > nowAspect){   
 
@@ -37,10 +76,9 @@ public class CameraControl : MonoBehaviour {
 			cam.rect=new Rect(0,(1f - changeAspect)*0.5f,1f,changeAspect);
 		}
 
-
 		Destroy(this);
 	}
-
+*/
 	/* 
 	 
 	  	    #region(inspector settings)

@@ -144,7 +144,7 @@ public class GameManager : MonoBehaviour {
 			else
 			{
 				myCamera.transform.position += new Vector3(0f, 4f * Time.deltaTime, 0f);
-				if(myCamera.transform.position.y > 0)
+				if(myCamera.transform.position.y > 2)
 				{
 					gameState = GameState.Start;
 					this.textHiScore.enabled = false;
@@ -250,8 +250,8 @@ public class GameManager : MonoBehaviour {
 			Vector3 newPosition = myCamera.transform.position;
 			newPosition.y = myCamera.transform.position.y - offset.y;
 
-			if (newPosition.y > 0) {
-				newPosition.y = 0;
+			if (newPosition.y > 2) {
+				newPosition.y = 2;
 			}
 
 			myCamera.transform.position = Vector3.Lerp (myCamera.transform.position, newPosition, 5.0f * Time.deltaTime);
