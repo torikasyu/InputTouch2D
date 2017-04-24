@@ -520,11 +520,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: InputTouch2D
   metroPackageVersion: 
-  metroCertificatePath: 
+  metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: torikasyu
+  metroCertificateIssuer: torikasyu
+  metroCertificateNotAfter: 0063e890c7dbd301
   metroApplicationDescription: InputTouch2D
   wsaImages: {}
   metroTileShortName: 
